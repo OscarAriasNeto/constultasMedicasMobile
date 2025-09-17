@@ -3,21 +3,18 @@ import styled from 'styled-components/native';
 import { ViewStyle } from 'react-native';
 import { ListItem, Avatar } from 'react-native-elements';
 import theme from '../styles/theme';
-
 interface Doctor {
   id: string;
   name: string;
   specialty: string;
   image: string;
 }
-
 interface DoctorListProps {
   doctors: Doctor[];
   onSelectDoctor: (doctor: Doctor) => void;
   selectedDoctorId?: string;
   style?: ViewStyle;
 }
-
 const DoctorList: React.FC<DoctorListProps> = ({
   doctors,
   onSelectDoctor,
@@ -53,7 +50,6 @@ const DoctorList: React.FC<DoctorListProps> = ({
     </Container>
   );
 };
-
 const styles = {
   listItem: {
     borderRadius: 8,
@@ -80,9 +76,7 @@ const styles = {
     opacity: 0.7,
   },
 };
-
 const Container = styled.View`
   margin-bottom: 15px;
 `;
-
-export default DoctorList; 
+export default DoctorList;

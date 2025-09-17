@@ -1,62 +1,54 @@
-import { useState, useCallback } from 'react';
+// src/screens/HomeScreen/hooks/useHomeScreen.ts
+import { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
 import { Appointment } from '../../../types/appointments';
-import { User } from '../../../types/auth';
-import { authApiService } from '../../../services/authApi';
+import { HomeAppointmentService } from '../services/appointmentService';
 
 export const useHomeScreen = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [doctors, setDoctors] = useState<User[]>([]);
 
   const loadAppointments = async () => {
     try {
-      const storedAppointments = await AsyncStorage.getItem('appointments');
-      if (storedAppointments) {
-        setAppointments(JSON.parse(storedAppointments));
-      }
+      const loadedAppointments = await HomeAppointmentService.loadAppointments();
+      setAppointments(loadedAppointments);
     } catch (error) {
       console.error('Erro ao carregar consultas:', error);
     }
   };
 
-  const loadDoctors = async () => {
-    try {
-      const doctorsData = await authApiService.getAllDoctors();
-      setDoctors(doctorsData);
-      console.log(`${doctorsData.length} médicos carregados no HomeScreen`);
-    } catch (error) {
-      console.error('Erro ao carregar médicos no HomeScreen:', error);
-      // Não mostra erro para o usuário no HomeScreen, apenas loga
-    }
-  };
-
-  const getDoctorInfo = useCallback((doctorId: string): User | undefined => {
-    return doctors.find(doctor => doctor.id === doctorId);
-  }, [doctors]);
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await Promise.all([loadAppointments(), loadDoctors()]);
-    setRefreshing(false);
-  };
-
-  // Carrega dados quando a tela estiver em foco
   useFocusEffect(
-    useCallback(() => {
+    React.useCallback(() => {
       loadAppointments();
-      loadDoctors();
     }, [])
   );
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadAppointments();
+    setRefreshing(false);
+  };
+
+  const handleDeleteAppointment = async (appointmentId: string) => {
+    try {
+      const updatedAppointments = await HomeAppointmentService.deleteAppointment(appointmentId);
+      setAppointments(updatedAppointments);
+    } catch (error) {
+      console.error('Erro ao deletar consulta:', error);
+    }
+  };
+
+  const handleEditAppointment = (appointment: Appointment) => {
+    // Lógica para editar consulta será implementada posteriormente
+    console.log('Editar consulta:', appointment);
+  };
+
   return {
     appointments,
-    doctors,
     refreshing,
     onRefresh,
-    getDoctorInfo,
-    loadAppointments,
-    loadDoctors
+    handleDeleteAppointment,
+    handleEditAppointment,
   };
 };
