@@ -1,3 +1,9 @@
+👨‍🏫 Autores
+
+Oscar Arias Neto - RM556936
+Julia Rebelles - RM554516
+Nicolas Souza - RM555571
+
 📱 Sistema de Agendamento de Consultas Médicas
 
 Aplicativo mobile desenvolvido em React Native com TypeScript, que facilita o agendamento e gerenciamento de consultas médicas de maneira simples, rápida e acessível.
@@ -86,10 +92,5 @@ src/
 📜 Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
-
-👨‍🏫 Autor
-
-Professor Hete Caetano – hete.caetano@fiap.com.br
-Oscar Arias Neto
 
 Agradecimentos especiais à React Native Community, React Navigation, Styled Components e a todos os colaboradores.
