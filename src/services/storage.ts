@@ -22,6 +22,8 @@ export const STORAGE_KEYS = {
   REGISTERED_USERS: '@MedicalApp:registeredUsers',
   APP_SETTINGS: '@MedicalApp:settings',
   STATISTICS_CACHE: '@MedicalApp:statisticsCache',
+  PROFILE_IMAGE: '@MedicalApp:profileImage',
+  PROFILE_IMAGE_INDEX: '@MedicalApp:profileImageIndex',
 } as const;
 
 export const storageService = {

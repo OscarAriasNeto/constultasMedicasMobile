@@ -1,23 +1,24 @@
 import { Patient } from '../../../types/appointments';
+import { dinoPatient } from '../../../utils/assetHelper';
 
 export const mockPatients: Patient[] = [
   {
     id: '1',
     name: 'Ana Souza',
-    image: 'https://randomuser.me/api/portraits/women/44.jpg',
+    image: dinoPatient,
   },
   {
     id: '2',
     name: 'Carlos Pereira',
-    image: 'https://randomuser.me/api/portraits/men/32.jpg',
+    image: dinoPatient,
   },
   {
     id: '3',
     name: 'Marina Lima',
-    image: 'https://randomuser.me/api/portraits/women/68.jpg',
+    image: dinoPatient,
   },
 ];
 
 export const getPatientInfo = (patientId: string): Patient | undefined => {
-  return mockPatients.find(patient => patient.id === patientId);
+  return mockPatients.find((patient) => patient.id === patientId);
 };

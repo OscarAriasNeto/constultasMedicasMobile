@@ -1,4 +1,5 @@
-import { Doctor } from "../types/types";
+import { Doctor } from '../types/types';
+import { dinoDoctor } from '../../../utils/assetHelper';
 
 // Lista de médicos disponíveis
 export const availableDoctors: Doctor[] = [
@@ -6,30 +7,30 @@ export const availableDoctors: Doctor[] = [
     id: '1',
     name: 'Dr. João Silva',
     specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
+    image: dinoDoctor,
   },
   {
     id: '2',
     name: 'Dra. Maria Santos',
     specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    image: dinoDoctor,
   },
   {
     id: '3',
     name: 'Dr. Pedro Oliveira',
     specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
+    image: dinoDoctor,
   },
   {
     id: '4',
     name: 'Dra. Ana Costa',
     specialty: 'Dermatologia',
-    image: 'https://randomuser.me/api/portraits/women/2.jpg',
+    image: dinoDoctor,
   },
   {
     id: '5',
     name: 'Dr. Carlos Mendes',
     specialty: 'Oftalmologia',
-    image: 'https://randomuser.me/api/portraits/men/3.jpg',
+    image: dinoDoctor,
   },
 ];

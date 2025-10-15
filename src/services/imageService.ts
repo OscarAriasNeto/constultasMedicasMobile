@@ -1,5 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { storageService, STORAGE_KEYS } from './storage';
+import { dinoPatient } from '../utils/assetHelper';
 
 export interface ImageResult {
   uri: string;
@@ -25,6 +26,43 @@ export const imageService = {
     }
   },
 
+  async takePhoto(): Promise<ImageResult | null> {
+    try {
+      const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+      if (cameraPermission.status !== 'granted') {
+        alert('Precisamos de acesso à câmera para tirar uma foto.');
+        return null;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+        base64: true,
+      });
+
+      if (result.canceled) {
+        return null;
+      }
+
+      const asset = result.assets?.[0];
+      if (!asset) {
+        return null;
+      }
+
+      return {
+        uri: asset.uri,
+        base64: asset.base64 ?? undefined,
+        width: asset.width,
+        height: asset.height,
+        fileSize: asset.fileSize,
+      };
+    } catch (error) {
+      console.error('Erro ao capturar foto:', error);
+      return null;
+    }
+  },
+
   // Abre a galeria para seleção de imagem
   async pickImageFromGallery(): Promise<ImageResult | null> {
     try {
@@ -39,151 +77,110 @@ export const imageService = {
         base64: true, // Necessário para armazenamento local
       });
 
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        return {
-          uri: asset.uri,
-          base64: asset.base64,
-          width: asset.width,
-          height: asset.height,
-          fileSize: asset.fileSize,
-        };
+      if (result.canceled) {
+        return null;
       }
-      
-      return null;
+
+      const asset = result.assets?.[0];
+      if (!asset) {
+        return null;
+      }
+
+      return {
+        uri: asset.uri,
+        base64: asset.base64 ?? undefined,
+        width: asset.width,
+        height: asset.height,
+        fileSize: asset.fileSize,
+      };
     } catch (error) {
       console.error('Erro ao selecionar imagem:', error);
-      throw new Error('Erro ao selecionar imagem da galeria');
-    }
-  },
-
-  // Abre a câmera para captura de foto
-  async takePhoto(): Promise<ImageResult | null> {
-    try {
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Desculpe, precisamos de permissão para usar a câmera!');
-        return null;
-      }
-
-      const result = await ImagePicker.launchCameraAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.8,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        return {
-          uri: asset.uri,
-          base64: asset.base64,
-          width: asset.width,
-          height: asset.height,
-          fileSize: asset.fileSize,
-        };
-      }
-      
       return null;
-    } catch (error) {
-      console.error('Erro ao capturar foto:', error);
-      throw new Error('Erro ao capturar foto com a câmera');
     }
   },
 
-  // Salva a imagem no armazenamento local
-  async saveProfileImage(userId: string, imageResult: ImageResult): Promise<string> {
+  // Salva a imagem localmente com base no tipo de usuário
+  async saveProfileImage(userId: string, image: ImageResult): Promise<string> {
     try {
-      if (!imageResult.base64) {
-        throw new Error('Dados da imagem não encontrados');
-      }
-
-      // Gera um identificador único para a imagem
-      const imageId = `profile_${userId}_${Date.now()}`;
-      const imageKey = `@MedicalApp:profileImage:${imageId}`;
-      
-      // Salva a imagem como base64 no AsyncStorage
-      const imageData = {
-        id: imageId,
-        userId,
-        base64: imageResult.base64,
-        uri: imageResult.uri,
-        metadata: {
-          width: imageResult.width,
-          height: imageResult.height,
-          fileSize: imageResult.fileSize,
-          createdAt: new Date().toISOString(),
-        },
-      };
+      const imageKey = `${STORAGE_KEYS.PROFILE_IMAGE}:${userId}`;
+      const imageData = JSON.stringify(image);
 
       await storageService.setItem(imageKey, imageData);
-      
-      // Atualiza o índice de imagens do usuário
-      await this.updateUserImageIndex(userId, imageId);
-      
-      // Retorna o URI local para uso imediato
-      return `data:image/jpeg;base64,${imageResult.base64}`;
+
+      const indexKey = STORAGE_KEYS.PROFILE_IMAGE_INDEX;
+      const userImages = (await storageService.getItem<string[]>(indexKey)) || [];
+
+      if (!userImages.includes(userId)) {
+        userImages.unshift(userId);
+        await storageService.setItem(indexKey, userImages);
+      }
+
+      return image.base64 ? `data:image/jpeg;base64,${image.base64}` : image.uri;
     } catch (error) {
-      console.error('Erro ao salvar imagem:', error);
-      throw new Error('Erro ao salvar imagem no dispositivo');
+      console.error('Erro ao salvar imagem de perfil:', error);
+      throw new Error('Não foi possível salvar a imagem de perfil');
     }
   },
 
-  // Atualiza o índice de imagens do usuário
-  async updateUserImageIndex(userId: string, imageId: string): Promise<void> {
+  // Obtém a imagem de perfil salva localmente
+  async getProfileImage(userId: string): Promise<ImageResult | null> {
     try {
-      const indexKey = `@MedicalApp:userImages:${userId}`;
-      const currentImages = await storageService.getItem<string[]>(indexKey, []);
-      
-      // Remove imagens antigas e adiciona a nova
-      const updatedImages = [imageId, ...currentImages.slice(0, 4)]; // Mantém apenas as 5 mais recentes
-      
+      const imageKey = `${STORAGE_KEYS.PROFILE_IMAGE}:${userId}`;
+      const imageData = await storageService.getItem<string>(imageKey);
+
+      if (!imageData) return null;
+
+      return JSON.parse(imageData);
+    } catch (error) {
+      console.error('Erro ao obter imagem de perfil:', error);
+      return null;
+    }
+  },
+
+  async getUserProfileImage(userId: string): Promise<string | null> {
+    const storedImage = await this.getProfileImage(userId);
+    if (!storedImage) {
+      return null;
+    }
+
+    return storedImage.base64
+      ? `data:image/jpeg;base64,${storedImage.base64}`
+      : storedImage.uri;
+  },
+
+  // Remove uma imagem de perfil salva
+  async removeProfileImage(userId: string): Promise<void> {
+    try {
+      const imageKey = `${STORAGE_KEYS.PROFILE_IMAGE}:${userId}`;
+      await storageService.removeItem(imageKey);
+
+      const indexKey = STORAGE_KEYS.PROFILE_IMAGE_INDEX;
+      const userImages = (await storageService.getItem<string[]>(indexKey)) || [];
+      const updatedImages = userImages.filter((id) => id !== userId);
       await storageService.setItem(indexKey, updatedImages);
     } catch (error) {
-      console.error('Erro ao atualizar índice de imagens:', error);
+      console.error('Erro ao remover imagem de perfil:', error);
+      throw new Error('Não foi possível remover a imagem de perfil');
     }
   },
 
-  // Recupera a imagem de perfil do usuário
-  async getUserProfileImage(userId: string): Promise<string | null> {
+  // Limpa imagens antigas para evitar uso excessivo de armazenamento
+  async cleanupOldImages(currentUserId?: string): Promise<void> {
     try {
-      const indexKey = `@MedicalApp:userImages:${userId}`;
-      const userImages = await storageService.getItem<string[]>(indexKey, []);
-      
-      if (userImages.length === 0) {
-        return null;
+      const indexKey = STORAGE_KEYS.PROFILE_IMAGE_INDEX;
+      const userImages = (await storageService.getItem<string[]>(indexKey)) || [];
+
+      if (userImages.length <= 5) {
+        return;
       }
 
-      // Pega a imagem mais recente
-      const latestImageId = userImages[0];
-      const imageKey = `@MedicalApp:profileImage:${latestImageId}`;
-      const imageData = await storageService.getItem(imageKey);
-      
-      if (imageData && imageData.base64) {
-        return `data:image/jpeg;base64,${imageData.base64}`;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Erro ao recuperar imagem do perfil:', error);
-      return null;
-    }
-  },
+      const imagesToRemove = userImages.slice(5).filter((id) => id !== currentUserId);
 
-  // Remove imagens antigas do usuário
-  async cleanupOldImages(userId: string): Promise<void> {
-    try {
-      const indexKey = `@MedicalApp:userImages:${userId}`;
-      const userImages = await storageService.getItem<string[]>(indexKey, []);
-      
-      // Remove imagens além das 5 mais recentes
-      const imagesToRemove = userImages.slice(5);
-      
       for (const imageId of imagesToRemove) {
-        const imageKey = `@MedicalApp:profileImage:${imageId}`;
+        const imageKey = `${STORAGE_KEYS.PROFILE_IMAGE}:${imageId}`;
         await storageService.removeItem(imageKey);
       }
-      
+
       // Atualiza o índice
       const updatedImages = userImages.slice(0, 5);
       await storageService.setItem(indexKey, updatedImages);
@@ -195,16 +192,18 @@ export const imageService = {
   // Valida se uma URI de imagem é válida
   validateImageUri(uri: string): boolean {
     if (!uri) return false;
-    
+
     // Verifica se é uma URI de dados base64 ou uma URI local válida
-    return uri.startsWith('data:image/') || 
-           uri.startsWith('file://') || 
-           uri.startsWith('content://') ||
-           uri.startsWith('https://');
+    return (
+      uri.startsWith('data:image/') ||
+      uri.startsWith('file://') ||
+      uri.startsWith('content://') ||
+      uri.startsWith('https://')
+    );
   },
 
   // Gera uma URI placeholder caso não tenha imagem
   getPlaceholderImage(): string {
-    return 'https://via.placeholder.com/150/6366f1/ffffff?text=Avatar';
+    return dinoPatient;
   },
 };

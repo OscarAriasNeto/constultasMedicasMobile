@@ -209,9 +209,12 @@ const ReasonContainer = styled.View`
   margin-bottom: 16px;
 `;
 
-const ConfirmationText = styled.Text<{ isCancel: boolean }>`
+type ConfirmationTextProps = { isCancel: boolean };
+
+const ConfirmationText = styled.Text<ConfirmationTextProps>`
   font-size: 16px;
-  color: ${(props: { isCancel: boolean }) => props.isCancel ? theme.colors.error : theme.colors.success};
+  color: ${({ isCancel }: ConfirmationTextProps) =>
+    isCancel ? theme.colors.error : theme.colors.success};
   text-align: center;
   margin-bottom: 20px;
   font-weight: 500;

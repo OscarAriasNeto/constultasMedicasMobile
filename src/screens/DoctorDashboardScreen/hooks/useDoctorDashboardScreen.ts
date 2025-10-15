@@ -9,7 +9,7 @@ import { appointmentService } from '../services/doctorDashboardService';
 export const useDoctorDashboard = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
-  const [statistics, setStatistics] = useState<Statistics | null>(null);
+  const [statistics, setStatistics] = useState<Partial<Statistics> | null>(null);
   const [loading, setLoading] = useState(true);
   
   const [modalVisible, setModalVisible] = useState(false);

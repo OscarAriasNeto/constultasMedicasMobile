@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthResponse, LoginCredentials, RegisterData, User } from '../types/auth';
+import { dinoDoctor, dinoPatient } from '../utils/assetHelper';
 
 // Chaves de armazenamento
 const STORAGE_KEYS = {
@@ -16,7 +17,7 @@ const mockDoctors = [
     email: 'joao@example.com',
     role: 'doctor' as const,
     specialty: 'Cardiologia',
-    image: 'https://randomuser.me/api/portraits/men/1.jpg',
+    image: dinoDoctor,
   },
   {
     id: '2',
@@ -24,7 +25,7 @@ const mockDoctors = [
     email: 'maria@example.com',
     role: 'doctor' as const,
     specialty: 'Pediatria',
-    image: 'https://randomuser.me/api/portraits/women/1.jpg',
+    image: dinoDoctor,
   },
   {
     id: '3',
@@ -32,7 +33,7 @@ const mockDoctors = [
     email: 'pedro@example.com',
     role: 'doctor' as const,
     specialty: 'Ortopedia',
-    image: 'https://randomuser.me/api/portraits/men/2.jpg',
+    image: dinoDoctor,
   },
 ];
 
@@ -42,7 +43,7 @@ const mockAdmin = {
   name: 'Administrador',
   email: 'admin@example.com',
   role: 'admin' as const,
-  image: 'https://randomuser.me/api/portraits/men/3.jpg',
+  image: dinoDoctor,
 };
 
 // Lista de usuários cadastrados (pacientes)
@@ -70,9 +71,7 @@ export const authService = {
     }
 
     // Verifica se é um paciente registrado
-    const patient = registeredUsers.find(
-      (p) => p.email === credentials.email
-    );
+    const patient = registeredUsers.find((p) => p.email === credentials.email);
     if (patient) {
       // Verifica a senha do paciente
       if (credentials.password === patient.password) {
@@ -104,8 +103,7 @@ export const authService = {
       name: data.name,
       email: data.email,
       role: 'patient' as const,
-      image: `https://randomuser.me/api/portraits/${registeredUsers.length % 2 === 0 ? 'men' : 'women'}/${registeredUsers.length + 1
-        }.jpg`,
+      image: dinoPatient,
       password: data.password,
     };
 

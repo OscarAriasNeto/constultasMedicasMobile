@@ -156,27 +156,29 @@ const Container = styled.View`
   margin-bottom: 16px;
 `;
 
-const ImageContainer = styled.View<{ size: number }>`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
+type SizeProps = { size: number };
+
+const ImageContainer = styled.View<SizeProps>`
+  width: ${({ size }: SizeProps) => size}px;
+  height: ${({ size }: SizeProps) => size}px;
   position: relative;
 `;
 
-const ProfileImage = styled.Image<{ size: number }>`
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
+const ProfileImage = styled.Image<SizeProps>`
+  width: ${({ size }: SizeProps) => size}px;
+  height: ${({ size }: SizeProps) => size}px;
+  border-radius: ${({ size }: SizeProps) => size / 2}px;
   border-width: 3px;
   border-color: ${theme.colors.primary};
 `;
 
-const LoadingOverlay = styled.View<{ size: number }>`
+const LoadingOverlay = styled.View<SizeProps>`
   position: absolute;
   top: 0;
   left: 0;
-  width: ${props => props.size}px;
-  height: ${props => props.size}px;
-  border-radius: ${props => props.size / 2}px;
+  width: ${({ size }: SizeProps) => size}px;
+  height: ${({ size }: SizeProps) => size}px;
+  border-radius: ${({ size }: SizeProps) => size / 2}px;
   background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;

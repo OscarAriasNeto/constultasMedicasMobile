@@ -1,35 +1,13 @@
-import React, { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { Button, Input, Text } from "react-native-elements";
-import styled from "styled-components/native";
-import theme from "../styles/theme";
-import { Doctor } from "../types/doctors";
+import React, { useState } from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 
-const doctors: Doctor[] = [
-  {
-    id: "1",
-    name: "Dr. João Silva",
-    specialty: "Cardiologista",
-    image: "https://mighty.tools/mockmind-api/content/human/91.jpg",
-  },
-  {
-    id: "2",
-    name: "Dra. Maria Santos",
-    specialty: "Dermatologista",
-    image: "https://mighty.tools/mockmind-api/content/human/97.jpg",
-  },
-  {
-    id: "3",
-    name: "Dr. Pedro Oliveira",
-    specialty: "Oftalmologista",
-    image: "https://mighty.tools/mockmind-api/content/human/79.jpg",
-  },
-];
+import Button from './Button';
+import TextInput from './TextInput';
+import theme from '../styles/theme';
+import { Doctor } from '../types/doctors';
+import { dinoDoctor } from '../utils/assetHelper';
 
-/*
-    Esta props será oque deve ser requisitado ao se enviar
-    o formulário preenchido.
-*/
 type AppointmentFormProps = {
   onSubmit: (appointment: {
     doctorId: string;
@@ -39,38 +17,43 @@ type AppointmentFormProps = {
   }) => void;
 };
 
-/*
-    Constante que gerará os tempos para o usuário
-    fazer a seleção de horários
-*/
+const doctors: Doctor[] = [
+  {
+    id: '1',
+    name: 'Dr. João Silva',
+    specialty: 'Cardiologista',
+    image: dinoDoctor,
+  },
+  {
+    id: '2',
+    name: 'Dra. Maria Santos',
+    specialty: 'Dermatologista',
+    image: dinoDoctor,
+  },
+  {
+    id: '3',
+    name: 'Dr. Pedro Oliveira',
+    specialty: 'Oftalmologista',
+    image: dinoDoctor,
+  },
+];
+
 const generateTimeSlots = () => {
-  /*
-        Esta constante cria uma lista para os
-        espaços dos quais terão as horas e faz
-        com que incluam variações como 15:30 e
-        15:00
-    */
-  const slots = [];
+  const slots: string[] = [];
   for (let hour = 9; hour < 18; hour++) {
-    slots.push(`${hour.toString().padStart(2, "0")}:00`);
-    slots.push(`${hour.toString().padStart(2, "0")}:30`);
+    slots.push(`${hour.toString().padStart(2, '0')}:00`);
+    slots.push(`${hour.toString().padStart(2, '0')}:30`);
   }
   return slots;
 };
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
-  //Criando useStates para leitura de dados
-  const [selectedDoctor, setSelectedDoctor] = useState<string>("");
-  const [dateInput, setDateInput] = useState("");
-  const [selectedTime, setSelectedTime] = useState<string>("");
-  const [description, setDescription] = useState("");
+  const [selectedDoctor, setSelectedDoctor] = useState<string>('');
+  const [dateInput, setDateInput] = useState('');
+  const [selectedTime, setSelectedTime] = useState<string>('');
+  const [description, setDescription] = useState('');
   const timeSlots = generateTimeSlots();
 
-  /*
-        Constante de verificação de data
-        para garantir o formato correto com
-        o uso de regex
-    */
   const validateDate = (inputDate: string) => {
     const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
     const match = inputDate.match(dateRegex);
@@ -78,7 +61,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
     if (!match) return false;
 
     const [, day, month, year] = match;
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
 
     const today = new Date();
     const maxDate = new Date(new Date().setMonth(new Date().getMonth() + 3));
@@ -87,21 +70,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
   };
 
   const handleDateChange = (text: string) => {
-    // Remove todos os caracteres não numéricos
-    const numbers = text.replace(/\D/g, "");
+    const numbers = text.replace(/\D/g, '');
 
-    // Formata a data enquanto digita
-    let formattedDate = "";
+    let formattedDate = '';
     if (numbers.length > 0) {
       if (numbers.length <= 2) {
         formattedDate = numbers;
       } else if (numbers.length <= 4) {
         formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2)}`;
       } else {
-        formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(
-          2,
-          4
-        )}/${numbers.slice(4, 8)}`;
+        formattedDate = `${numbers.slice(0, 2)}/${numbers.slice(2, 4)}/${numbers.slice(4, 8)}`;
       }
     }
 
@@ -110,17 +88,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = () => {
     if (!selectedDoctor || !selectedTime || !description) {
-      alert("Por favor, preencha todos os campos");
+      alert('Por favor, preencha todos os campos');
       return;
     }
 
     if (!validateDate(dateInput)) {
-      alert("Por favor, insira uma data válida (DD/MM/AAAA)");
+      alert('Por favor, insira uma data válida (DD/MM/AAAA)');
       return;
     }
 
-    const [day, month, year] = dateInput.split("/");
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const [day, month, year] = dateInput.split('/');
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, parseInt(day, 10));
 
     onSubmit({
       doctorId: selectedDoctor,
@@ -130,11 +108,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
     });
   };
 
-  const isTimeSlotAvailable = (time: string) => {
-    // Aqui você pode adicionar lógica para verificar se o horário está disponível
-    // Por exemplo, verificar se já existe uma consulta agendada para este horário
-    return true;
-  };
+  const isTimeSlotAvailable = () => true;
 
   return (
     <Container>
@@ -156,34 +130,29 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
       </DoctorList>
 
       <Title>Data e Hora</Title>
-      <Input
+      <TextInput
         placeholder="Data (DD/MM/AAAA)"
         value={dateInput}
         onChangeText={handleDateChange}
         keyboardType="numeric"
         maxLength={10}
-        containerStyle={InputContainer}
-        errorMessage={
-          dateInput && !validateDate(dateInput) ? "Data inválida" : undefined
-        }
+        errorMessage={dateInput && !validateDate(dateInput) ? 'Data inválida' : undefined}
       />
 
       <TimeSlotsContainer>
-        <TimeSlotButton>Horários Disponíveis:</TimeSlotButton>
+        <TimeSlotsHeader>Horários Disponíveis</TimeSlotsHeader>
         <TimeSlotsGrid>
           {timeSlots.map((time) => {
-            const isAvailable = isTimeSlotAvailable(time);
+            const isSelected = selectedTime === time;
+            const isAvailable = isTimeSlotAvailable();
             return (
               <TimeSlotButton
                 key={time}
-                selected={selectedTime === time}
+                selected={isSelected}
                 disabled={!isAvailable}
                 onPress={() => isAvailable && setSelectedTime(time)}
               >
-                <TimeSlotText
-                  selected={selectedTime === time}
-                  disabled={!isAvailable}
-                >
+                <TimeSlotText selected={isSelected} disabled={!isAvailable}>
                   {time}
                 </TimeSlotText>
               </TimeSlotButton>
@@ -192,30 +161,25 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
         </TimeSlotsGrid>
       </TimeSlotsContainer>
 
-      <Input
+      <TextInput
         placeholder="Descrição da consulta"
         value={description}
         onChangeText={setDescription}
         multiline
         numberOfLines={4}
-        containerStyle={InputContainer}
+        textAlignVertical="top"
+        helperText="Informe detalhes importantes para a consulta"
       />
 
-      <SubmitButton
+      <Button
         title="Agendar Consulta"
         onPress={handleSubmit}
-        buttonStyle={{
-          backgroundColor: theme.colors.primary,
-          borderRadius: 8,
-          padding: 12,
-          marginTop: 20,
-        }}
+        style={{ marginTop: theme.spacing.large }}
       />
     </Container>
   );
 };
 
-//Css do componente
 const Container = styled.View`
   padding: ${theme.spacing.medium}px;
 `;
@@ -231,19 +195,24 @@ const DoctorList = styled.ScrollView`
   margin-bottom: ${theme.spacing.large}px;
 `;
 
-const DoctorCard = styled(TouchableOpacity) <{ selected: boolean }>`
+type DoctorCardProps = { selected: boolean };
+
+const DoctorCard = styled(TouchableOpacity)<DoctorCardProps>`
   flex-direction: row;
   align-items: center;
   padding: ${theme.spacing.medium}px;
-  background-color: ${(props: { selected: boolean }) =>
-    props.selected ? theme.colors.primary : theme.colors.white};
-  border-radius: 8px;
+  background-color: ${({ selected }: DoctorCardProps) =>
+    selected ? theme.colors.secondary : theme.colors.surface};
+  border-radius: ${theme.radii.large}px;
   margin-bottom: ${theme.spacing.medium}px;
-  elevation: 2;
-  shadow-color: #000;
-  shadow-opacity: 0.1;
-  shadow-radius: 4px;
-  shadow-offset: 0px 2px;
+  border-width: 2px;
+  border-color: ${({ selected }: DoctorCardProps) =>
+    selected ? theme.colors.primary : theme.colors.border};
+  shadow-color: ${theme.colors.shadow};
+  shadow-opacity: 0.2;
+  shadow-radius: 12px;
+  shadow-offset: 0px 8px;
+  elevation: 3;
 `;
 
 const DoctorImage = styled.Image`
@@ -264,18 +233,19 @@ const DoctorName = styled.Text`
 `;
 
 const DoctorSpecialty = styled.Text`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${theme.colors.text};
-  opacity: 0.8;
+  font-size: ${theme.typography.caption.fontSize}px;
+  color: ${theme.colors.textSecondary};
+  margin-top: ${theme.spacing.xsmall}px;
 `;
 
 const TimeSlotsContainer = styled.View`
   margin-bottom: ${theme.spacing.large}px;
 `;
 
-const TimeSlotsTitle = styled.Text`
+const TimeSlotsHeader = styled.Text`
   font-size: ${theme.typography.body.fontSize}px;
   color: ${theme.colors.text};
+  font-weight: 600;
   margin-bottom: ${theme.spacing.small}px;
 `;
 
@@ -285,47 +255,32 @@ const TimeSlotsGrid = styled.View`
   gap: ${theme.spacing.small}px;
 `;
 
-const TimeSlotButton = styled(TouchableOpacity) <{
-  selected: boolean;
-  disabled: boolean;
-}>`
-  background-color: ${(props: { selected: boolean; disabled: boolean }) =>
-    props.disabled
-      ? theme.colors.background
-      : props.selected
-        ? theme.colors.primary
-        : theme.colors.white};
-  padding: ${theme.spacing.small}px ${theme.spacing.medium}px;
-  border-radius: 8px;
-  border-width: 1px;
-  border-color: ${(props: { selected: boolean; disabled: boolean }) =>
-    props.disabled
-      ? theme.colors.background
-      : props.selected
-        ? theme.colors.primary
-        : theme.colors.text};
-  opacity: ${(props: { disabled: boolean }) => (props.disabled ? 0.5 : 1)};
+type TimeSlotButtonProps = { selected: boolean; disabled: boolean };
+
+const TimeSlotButton = styled(TouchableOpacity)<TimeSlotButtonProps>`
+  width: 22%;
+  padding: ${theme.spacing.small}px;
+  border-radius: ${theme.radii.small}px;
+  border-width: 2px;
+  border-color: ${({ selected }: TimeSlotButtonProps) =>
+    selected ? theme.colors.primary : theme.colors.border};
+  background-color: ${({ selected }: TimeSlotButtonProps) =>
+    selected ? theme.colors.secondary : theme.colors.surface};
+  opacity: ${({ disabled }: TimeSlotButtonProps) => (disabled ? 0.4 : 1)};
+  align-items: center;
 `;
 
-const TimeSlotText = styled(Text) <{ selected: boolean; disabled: boolean }>`
-  font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { selected: boolean; disabled: boolean }) =>
-    props.disabled
-      ? theme.colors.text
-      : props.selected
-        ? theme.colors.white
+type TimeSlotTextProps = { selected: boolean; disabled: boolean };
+
+const TimeSlotText = styled(Text)<TimeSlotTextProps>`
+  font-size: ${theme.typography.caption.fontSize}px;
+  font-weight: 600;
+  color: ${({ disabled, selected }: TimeSlotTextProps) =>
+    disabled
+      ? theme.colors.textSecondary
+      : selected
+        ? theme.colors.primary
         : theme.colors.text};
-`;
-
-const InputContainer = {
-  marginBottom: theme.spacing.medium,
-  backgroundColor: theme.colors.white,
-  borderRadius: 8,
-  paddingHorizontal: theme.spacing.medium,
-};
-
-const SubmitButton = styled(Button)`
-  margin-top: ${theme.spacing.large}px;
 `;
 
 export default AppointmentForm;

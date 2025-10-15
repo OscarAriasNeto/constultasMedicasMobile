@@ -22,7 +22,9 @@ const EditProfileScreen: React.FC = () => {
   
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [specialty, setSpecialty] = useState(user?.specialty || '');
+  const [specialty, setSpecialty] = useState(
+    user?.role === 'doctor' ? user.specialty : ''
+  );
   const [profileImage, setProfileImage] = useState(user?.image || '');
   const [loading, setLoading] = useState(false);
 
@@ -198,9 +200,11 @@ const ProfileCard = styled.View`
 
 // Avatar removido - agora usamos o ProfileImagePicker
 
-const RoleBadge = styled.View<{ role: string }>`
-  background-color: ${(props: { role: string }) => {
-    switch (props.role) {
+type RoleBadgeProps = { role: string };
+
+const RoleBadge = styled.View<RoleBadgeProps>`
+  background-color: ${({ role }: RoleBadgeProps) => {
+    switch (role) {
       case 'admin':
         return theme.colors.primary + '20';
       case 'doctor':

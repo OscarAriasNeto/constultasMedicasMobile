@@ -1,15 +1,22 @@
 import React from 'react';
-import { ScrollView, ViewStyle } from 'react-native';
-import { Button, Input } from 'react-native-elements';
 import { useNavigation } from '@react-navigation/native';
 
 import Header from '../../components/Header';
 import DoctorList from '../../components/DoctorList';
 import TimeSlotList from '../../components/TimeSlotList';
-
+import Button from '../../components/Button';
+import TextInput from '../../components/TextInput';
+import {
+  Container,
+  Content,
+  FormCard,
+  Title,
+  SectionTitle,
+  ErrorText,
+} from './styles';
 import { useCreateAppointment } from './hooks/useCreateAppointment';
-import { Container, Title, SectionTitle, ErrorText, styles } from './styles';
 import { availableDoctors } from './models/doctors';
+import theme from '../../styles/theme';
 
 const CreateAppointmentScreen: React.FC = () => {
   const navigation = useNavigation();
@@ -28,44 +35,47 @@ const CreateAppointmentScreen: React.FC = () => {
   return (
     <Container>
       <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Title>Agendar Consulta</Title>
+      <Content>
+        <FormCard>
+          <Title>Agendar Consulta</Title>
 
-        <Input
-          placeholder="Data (DD/MM/AAAA)"
-          value={date}
-          onChangeText={setDate}
-          containerStyle={styles.input}
-          keyboardType="numeric"
-        />
+          <TextInput
+            label="Data"
+            placeholder="DD/MM/AAAA"
+            value={date}
+            onChangeText={setDate}
+            keyboardType="numeric"
+            maxLength={10}
+          />
 
-        <SectionTitle>Selecione um Horário</SectionTitle>
-        <TimeSlotList onSelectTime={setSelectedTime} selectedTime={selectedTime} />
+          <SectionTitle>Selecione um Horário</SectionTitle>
+          <TimeSlotList onSelectTime={setSelectedTime} selectedTime={selectedTime} />
 
-        <SectionTitle>Selecione um Médico</SectionTitle>
-        <DoctorList
-          doctors={availableDoctors}
-          onSelectDoctor={setSelectedDoctor}
-          selectedDoctorId={selectedDoctor?.id}
-        />
+          <SectionTitle>Selecione um Médico</SectionTitle>
+          <DoctorList
+            doctors={availableDoctors}
+            onSelectDoctor={setSelectedDoctor}
+            selectedDoctorId={selectedDoctor?.id}
+          />
 
-        {error ? <ErrorText>{error}</ErrorText> : null}
+          {error ? <ErrorText>{error}</ErrorText> : null}
 
-        <Button
-          title="Agendar"
-          onPress={handleCreateAppointment}
-          loading={loading}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.buttonStyle}
-        />
+          <Button
+            title="Agendar"
+            onPress={handleCreateAppointment}
+            loading={loading}
+            style={{ marginTop: theme.spacing.large }}
+          />
 
-        <Button
-          title="Cancelar"
-          onPress={() => navigation.goBack()}
-          containerStyle={styles.button as ViewStyle}
-          buttonStyle={styles.cancelButton}
-        />
-      </ScrollView>
+          <Button
+            title="Cancelar"
+            variant="ghost"
+            onPress={() => navigation.goBack()}
+            style={{ marginTop: theme.spacing.small }}
+            textStyle={{ color: theme.colors.primary }}
+          />
+        </FormCard>
+      </Content>
     </Container>
   );
 };
