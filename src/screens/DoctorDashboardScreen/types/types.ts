@@ -2,7 +2,7 @@ import { Statistics } from "../../../services/statistics";
 import { Appointment } from "../../../types/appointments";
 
 export interface StatisticsDisplayProps {
-  statistics: Statistics | null;
+  statistics: Partial<Statistics> | null;
 }
 
 export interface AppointmentCardItemProps {

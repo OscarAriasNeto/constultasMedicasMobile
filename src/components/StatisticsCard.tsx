@@ -32,7 +32,9 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({
   );
 };
 
-const Container = styled.View<{ color: string }>`
+type ColoredProps = { color: string };
+
+const Container = styled.View<ColoredProps>`
   background-color: ${theme.colors.white};
   border-radius: 12px;
   padding: 16px;
@@ -40,7 +42,7 @@ const Container = styled.View<{ color: string }>`
   min-height: 120px;
   justify-content: space-between;
   border-left-width: 4px;
-  border-left-color: ${(props) => props.color};
+  border-left-color: ${({ color }: ColoredProps) => color};
   shadow-color: ${theme.colors.text};
   shadow-offset: 0px 2px;
   shadow-opacity: 0.1;
@@ -65,10 +67,10 @@ const Title = styled.Text`
   opacity: 0.8;
 `;
 
-const Value = styled.Text<{ color: string }>`
+const Value = styled.Text<ColoredProps>`
   font-size: 28px;
   font-weight: bold;
-  color: ${(props) => props.color};
+  color: ${({ color }: ColoredProps) => color};
   margin-bottom: 4px;
 `;
 

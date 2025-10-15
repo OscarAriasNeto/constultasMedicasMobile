@@ -81,9 +81,12 @@ export const Description = styled.Text`
   margin-top: 4px;
 `;
 
-export const Status = styled.Text<{ status: string }>`
+type StatusProps = { status: string };
+
+export const Status = styled.Text<StatusProps>`
   font-size: ${theme.typography.body.fontSize}px;
-  color: ${(props: { status: string }) => props.status === 'pending' ? theme.colors.error : theme.colors.success};
+  color: ${({ status }: StatusProps) =>
+    status === 'pending' ? theme.colors.error : theme.colors.success};
   margin-top: 4px;
   font-weight: bold;
 `;

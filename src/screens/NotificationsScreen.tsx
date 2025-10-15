@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView, ViewStyle, Alert } from 'react-native';
+import { ScrollView, ViewStyle, Alert, StyleSheet } from 'react-native';
 import { Button, ListItem, Badge } from 'react-native-elements';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -174,7 +174,7 @@ const NotificationsScreen: React.FC = () => {
   );
 };
 
-const styles = {
+const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
   },
@@ -208,7 +208,7 @@ const styles = {
     marginTop: 4,
     lineHeight: 20,
   },
-};
+});
 
 const Container = styled.View`
   flex: 1;
@@ -248,12 +248,16 @@ const EmptyText = styled.Text`
   opacity: 0.7;
 `;
 
-const NotificationCard = styled.View<{ isRead: boolean }>`
-  background-color: ${(props) => props.isRead ? theme.colors.white : theme.colors.primary + '10'};
+type NotificationCardProps = { isRead: boolean };
+
+const NotificationCard = styled.View<NotificationCardProps>`
+  background-color: ${({ isRead }: NotificationCardProps) =>
+    isRead ? theme.colors.white : theme.colors.primary + '10'};
   border-radius: 8px;
   margin-bottom: 8px;
   border-width: 1px;
-  border-color: ${(props) => props.isRead ? theme.colors.border : theme.colors.primary + '30'};
+  border-color: ${({ isRead }: NotificationCardProps) =>
+    isRead ? theme.colors.border : theme.colors.primary + '30'};
 `;
 
 const NotificationIcon = styled.Text`

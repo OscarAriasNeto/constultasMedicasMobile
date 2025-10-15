@@ -16,6 +16,7 @@ import {
   ActionButtons,
   ActionButton,
 } from '../styles';
+import { dinoDoctor } from '../../../utils/assetHelper';
 
 interface AppointmentItemProps {
   appointment: Appointment;
@@ -44,11 +45,13 @@ export const AppointmentItem: React.FC<AppointmentItemProps> = ({
 
   return (
     <AppointmentCard>
-      <DoctorImage source={{ uri: doctor?.image || 'https://via.placeholder.com/100' }} />
+      <DoctorImage source={{ uri: doctor?.image || dinoDoctor }} />
       <InfoContainer>
         <DoctorName>{doctor?.name || 'Médico não encontrado'}</DoctorName>
         <DoctorSpecialty>{doctor?.specialty || 'Especialidade não encontrada'}</DoctorSpecialty>
-        <DateTime>{new Date(appointment.date).toLocaleDateString()} - {appointment.time}</DateTime>
+        <DateTime>
+          {new Date(appointment.date).toLocaleDateString()} - {appointment.time}
+        </DateTime>
         <Description>{appointment.description}</Description>
         <Status status={appointment.status}>
           {appointment.status === 'pending' ? 'Pendente' : 'Confirmado'}
